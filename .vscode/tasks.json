@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Rebuild Project",
+        "type": "shell",
+        "command": "@command:vexrobotics.vexcode.project.rebuild",
+        "problemMatcher": []
+      },
+      {
+        "label": "Download After Rebuild",
+        "type": "shell",
+        "command": "@command:vexrobotics.vexcode.system.download",
+        "dependsOn": "Rebuild Project",
+        "problemMatcher": []
+      }
+    ]
+  }
+  

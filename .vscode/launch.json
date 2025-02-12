@@ -2,14 +2,21 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Run Project Tasks",
+      "type": "node",
+      "request": "launch",
+      "preLaunchTask": "Rebuild Project",
+      "postDebugTask": "Download After Rebuild"
+    },
+    {
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "f:/C++/Progects/AutoDriveBot/src",
-      "program": "f:/C++/Progects/AutoDriveBot/src/build/Debug/outDebug",
+      "cwd": "f:/C++/Progects/vexOne",
+      "program": "f:/C++/Progects/vexOne/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
