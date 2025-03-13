@@ -15,8 +15,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "f:/C++/Progects/vexOne",
-      "program": "f:/C++/Progects/vexOne/build/Debug/outDebug",
+      "cwd": "c:/Users/Даниил Сергей/Рабочий стол/AutoDriveBot",
+      "program": "c:/Users/Даниил Сергей/Рабочий стол/AutoDriveBot/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

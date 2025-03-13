@@ -5,7 +5,10 @@
 #include <map>
 #include <functional>
 #include <cstdlib>
-#include <ctime> 
+#include <ctime>
+#include <stdio.h>
+#include <stdbool.h>
+#include <vex_device.h>
 using namespace vex;
 
 brain Brain;
@@ -18,10 +21,10 @@ inertial BrainInertial = inertial();
 touchled leftLed(PORT7);
 touchled rightLed(PORT8);
 //Константы
-constexpr int TURN_SPEED = 20;
+constexpr int TURN_SPEED = 80;
 constexpr double kP = 0.1;  // Пропорциональный коэффициент
 constexpr double kI = 0.0;  // Интегральный коэффициент (если требуется)
-constexpr double kD = 0.1;  // Дифференциальный коэффициент
+constexpr double kD = 0;  // Дифференциальный коэффициент
 constexpr bool debugSounds = true;
 enum lrsType {
     LEFT,
@@ -40,6 +43,20 @@ std::map<vex::motor*, int> motorMap{
 
 
 int speed = 50;
+double timeRobot = 0;
+
+void startTimer()
+{
+    timeRobot = Brain.timer(timeUnits::msec);
+}
+void sleepForTime(int msec)
+{
+    while(Brain.timer(timeUnits::msec) - (double)timeRobot <= msec)
+    {
+        
+    }
+}
+
 void smoothlySetSpeed()
 {
     int currentSpeed1 = LeftMotor.velocity(percent);  // Текущая скорость мотора 1
@@ -156,7 +173,6 @@ void drawCoolFace1()
     {
         int glassesY = 40 - frame;
         int mouthY = (frame % 2 == 0) ? 65 : 67;
-
         Brain.Screen.clearScreen();
 
         // Голова (желтый круг)
@@ -307,10 +323,17 @@ void setTurn(int degree, int plusMinus = 10)
     if(degree > 0)
     {
         turning = RIGHT;
-        TurnMotor.spinToPosition(std::min(45,degree), rotationUnits::deg,TURN_SPEED,velocityUnits::pct, false);
+        TurnMotor.spinToPosition(std::min(55,degree), rotationUnits::deg,TURN_SPEED,velocityUnits::pct, false);
         setSpeed(&LeftMotor, DefaultLeftMotorSpeed + plusMinus);
-        setSpeed(&RightMotor, 0);
-    }
+        if(degree >= 70)
+        {
+            setSpeed(&RightMotor, -2);
+        }
+        else
+        {   
+            setSpeed(&RightMotor, 0);
+        }
+        }
     else if(degree == 0)
     {
         turning = STRAIGHT;
@@ -319,9 +342,16 @@ void setTurn(int degree, int plusMinus = 10)
     }
     else{
         turning = LEFT;
-        TurnMotor.spinToPosition(std::max(-45,degree), rotationUnits::deg,TURN_SPEED,velocityUnits::pct, false);
+        TurnMotor.spinToPosition(std::max(-55,degree), rotationUnits::deg,TURN_SPEED,velocityUnits::pct, false);
         setSpeed(&RightMotor, DefaultRightMotorSpeed + plusMinus);
-        setSpeed(&LeftMotor, 0);
+        if(degree <= -70)
+        {
+            setSpeed(&LeftMotor, -2);
+        }
+        else 
+        {
+            setSpeed(&LeftMotor, 0);
+        }
     }
     
 }
@@ -349,6 +379,7 @@ void followLinePID() {
             }
         setSpeed(&LeftMotor, DefaultLeftMotorSpeed + correction);
         setSpeed(&RightMotor, DefaultRightMotorSpeed - correction);
+        wait(100,msec);
     }
 }
 void runMotors(vex::directionType typ = forward)
@@ -364,10 +395,13 @@ void stopMotors()
 
 void redColor()
 {
+    startTimer();
     int startRotation = BrainInertial.rotation();
-    RightMotor.spinFor(20,rotationUnits::deg,false);
-    LeftMotor.spinFor(20,rotationUnits::deg, true);
-    setTurn(-45,0);
+    RightMotor.spinFor(0,rotationUnits::deg,false);
+    LeftMotor.spinFor(0,rotationUnits::deg, true);
+    setTurn(-70,4);
+    stopMotors();
+    wait(1000,msec);
     runMotors();
     LeftMotor.stop(brakeType::hold);
     LeftMotor.stop();
@@ -383,14 +417,20 @@ void redColor()
 
     stopMotors();
     setTurn(20,8);
+    sleepForTime(3000);
     wait(100,msec);
 }
 void blueColor()
 {
     stopMotors();
-    setTurn(40,7);
+    resetMotorsSpeed();
+    LeftMotor.spinFor(150,degrees,false);
+    stopMotors();
+    RightMotor.spinFor(150,degrees,true);
+    setTurn(70,2);
     wait(1500,msec);
-    RightMotor.spin(reverse);
+    RightMotor.setStopping(brakeType::coast);
+    RightMotor.stop();
     LeftMotor.spin(reverse);
     while (BrainInertial.rotation(degrees) > -180) {
     // Выводим текущие градусы на экран Brain
@@ -406,18 +446,21 @@ void blueColor()
     resetMotorsSpeed();
     LeftMotor.spinFor(-300,degrees,false);
     RightMotor.spinFor(-300,degrees,true);
+    vexSerialWriteBuffer(1, (uint8_t*)"Sleep", 6);
     wait(10,sec);
-    LeftMotor.spinFor(250,degrees,false);
-    RightMotor.spinFor(250,degrees,true);
+    startTimer();
+    vexSerialWriteBuffer(1, (uint8_t*)"FromGarage", 11);
+    LeftMotor.spinFor(350,degrees,false);
+    RightMotor.spinFor(350,degrees,true);
     wait(1,sec);
     runMotors();
-    setTurn(40,7);
+    setTurn(70,7);
     wait(500,msec);
     while (RightOptical.brightness() > 90) {
         vex::task::sleep(1);
     }
     wait(1,sec);
-    while (RightOptical.brightness() < 60 && (RightOptical.hue() >= 235 || RightOptical.hue() <= 175)) {
+    while (RightOptical.brightness() < 85 && (RightOptical.hue() >= 235 || RightOptical.hue() <= 175)) {
         vex::task::sleep(1);
     }
 
@@ -428,12 +471,12 @@ void blueColor()
     {
         Brain.playSound(soundType::tada);
     }
+    stopMotors();
+    sleepForTime(7000);
 }
 void parallelPark() {
     int startRotation = BrainInertial.rotation();
     stopMotors();
-    LeftMotor.spinFor(200,rotationUnits::deg,false);
-    RightMotor.spinFor(200,rotationUnits::deg,true);
     wait(500,msec);
     setTurn(40);
     wait(0.5, sec);
@@ -441,7 +484,12 @@ void parallelPark() {
     while (BrainInertial.rotation(degrees) - startRotation > -43) {}
     stopMotors();
     wait(300,msec);
+    
+    setTurn(0);
+    LeftMotor.spinFor(-350,degrees,false);
+    RightMotor.spinFor(-350,degrees,true);
 
+    wait(0.5, sec);
     setTurn(-40);
     wait(0.5, sec);
     runMotors(reverse);
@@ -459,7 +507,6 @@ void parallelPark() {
         Brain.playSound(soundType::tada);
     }
     wait(5, sec);
-
 
     setTurn(-40);
     wait(0.5, sec);
@@ -496,11 +543,37 @@ int beepTask() {
 }
 
 
+int Brain_precision = 0, Console_precision = 0;
+
+bool running = true;
+
+void watchDog() {
+    int lastTime = Brain.Timer.system();
+    while (running) {
+        vex::this_thread::sleep_for(500);
+        int currentTime = Brain.Timer.system();
+
+        // Если программа "останавливается" (не обновляет таймер), можно выполнить действия
+        if (currentTime == lastTime) {
+            Brain.Screen.print("Program stopped!");
+            Brain.playSound(soundType::doorClose);
+            break;
+        }
+        lastTime = currentTime;
+    }
+}
 
 int main() {
+    
+    vexGenericSerialEnable(1,115200);
+    wait(100,msec);
+    vex::thread monitor(watchDog);
+    vexSerialWriteBuffer(1, (uint8_t*)"RobotCalibrating", 17);
     TurnMotor.setPosition(0,rotationUnits::deg);
-    TurnMotor.setStopping(brakeType::hold);
+    TurnMotor.setStopping(brakeType::coast);
     TurnMotor.setMaxTorque(100, percentUnits::pct);
+    LeftMotor.setMaxTorque(100, percentUnits::pct);
+    RightMotor.setMaxTorque(100, percentUnits::pct);
     LeftOptical.setLightPower(100);
     LeftOptical.setLight(vex::ledState::on);
     RightOptical.setLightPower(100);
@@ -515,21 +588,27 @@ int main() {
         wait(5,sec);
         Brain.programStop();
     }
+    startTimer();
     BrainInertial.calibrate();
     while (BrainInertial.isCalibrating()) {
         Brain.Screen.print("Calibrating...");
         vex::task::sleep(100);
         Brain.Screen.clearLine(1);
     }
+    sleepForTime(9000);
+
+    vexSerialWriteBuffer(1, (uint8_t*)"EndTask", 8);
     thread tur = thread(taskTuring);
     resetMotorsSpeed();
     runMotors();
+
     thread lineFollowerThread = thread(followLinePID);
     
     while (true) {
         vex::task::sleep(50);
         if(RightOptical.color() == colorType::red)
         {
+            vexSerialWriteBuffer(1, (uint8_t*)"TurnLeft", 9);
             lineFollowerThread.interrupt();
             stopMotors();
             redColor();
@@ -540,9 +619,11 @@ int main() {
             resetMotorsSpeed();
             lineFollowerThread = thread(followLinePID);
             runMotors();
+            vexSerialWriteBuffer(1, (uint8_t*)"EndTask", 8);
         }
         else if(RightOptical.hue() <= 235 && RightOptical.hue() >= 175)
         {
+            vexSerialWriteBuffer(1, (uint8_t*)"ToGarage", 9);
             lineFollowerThread.interrupt();
             if(debugSounds)
             {
@@ -557,10 +638,12 @@ int main() {
             {
                 vex::task::sleep(10);
             }
+            vexSerialWriteBuffer(1, (uint8_t*)"EndTask", 8);
             vex::task::sleep(600);
         }
         else if(RightOptical.color() == colorType::green)
         {
+            vexSerialWriteBuffer(1, (uint8_t*)"ToParallelPark", 15);
             lineFollowerThread.interrupt();
             if(debugSounds)
             {
@@ -569,6 +652,9 @@ int main() {
             stopMotors();
             parallelPark();
             tur.interrupt();
+
+            vexSerialWriteBuffer(1, (uint8_t*)"TheEnd", 7);
+
             while (true)
             {
                 int randomChoice = std::rand() % 3;
@@ -586,10 +672,10 @@ int main() {
             }
             }
             vex::task::sleep(1000);
-
         }
         else if (BrainInertial.pitch(degrees) > 10 || BrainInertial.pitch(degrees) < -10) 
         {
+            vexSerialWriteBuffer(1, (uint8_t*)"ToMountain", 11);
             lineFollowerThread.interrupt();
             stopMotors();
             if(debugSounds)
@@ -612,29 +698,7 @@ int main() {
             Brain.Screen.setCursor(1, 1);
             Brain.Screen.clearScreen();
             Brain.Screen.print("Pitch normalized!");
-        }
-        else if(BrainInertial.rotation() <= -355)
-        {
-            lineFollowerThread.interrupt();
-            tur.interrupt();
-            stopMotors();
-            Brain.playSound(soundType::fillup);
-            while (true)
-            {
-                int randomChoice = std::rand() % 3;
-                if (randomChoice == 0)
-                {
-                    drawCoolFace1(); // Рисуем первый смайлик
-                }
-                else if (randomChoice == 1)
-                {
-                    drawCoolFace2(); // Рисуем второй смайлик
-                }
-                else
-                {
-                    drawCoolFace3(); // Рисуем третий смайлик
-                }
-            }
+            vexSerialWriteBuffer(1, (uint8_t*)"Task end\n", 10);
         }
     }
     

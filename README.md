@@ -20,6 +20,10 @@ code --install-extension ms-vscode.cpptools
 code --install-extension VEXRobotics.vexfeedback
 code --install-extension VEXRobotics.vexcode
 ```
+#### Открытие
+```bash
+code .
+```
 #### Сборка
 ![Сборка](Запись-2025-02-12-094851.gif)
 
