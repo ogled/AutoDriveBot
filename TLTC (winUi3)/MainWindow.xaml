@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="TLTC__winUi3_.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TLTC__winUi3_"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="TLTC">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <NavigationView IsBackButtonVisible="Visible" IsBackEnabled="True" BackRequested="mainView_BackRequested" Loaded="mainView_Loaded" SelectionChanged="mainView_SelectionChanged" x:Name="mainView" IsPaneOpen="True" PaneDisplayMode="LeftCompact" Background="{ThemeResource SystemChromeMediumColor}" Grid.Row="0">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Icon="Home" Content="Главная">
+                </NavigationViewItem>
+                <NavigationViewItem Content="Информация">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D2;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+            <Frame x:Name="ContentFrame"></Frame>
+        </NavigationView>
+    </Grid>
+</Window>

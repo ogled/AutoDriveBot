@@ -1,0 +1,10 @@
+namespace TLTC__winUi3_
+{
+    [default_interface]
+    runtimeclass MainPageApp : Microsoft.UI.Xaml.Controls.Page
+    {
+        MainPageApp();
+        Int32 MyProperty;
+
+    }
+}
