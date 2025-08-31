@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="MainWindow.xaml" />
+    <Page Include="Home.xaml" />
+    <Page Include="MainPageApp.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="MainWindow.idl" />
+    <Midl Include="Assets\Animated\AnimatedVisuals.CheckmarkAnim.idl">
+      <Filter>Assets\Animated\CheckMark</Filter>
+    </Midl>
+    <Midl Include="Assets\Animated\AnimatedVisuals.RobotGoAnim.idl">
+      <Filter>Assets\Animated\RobotGo</Filter>
+    </Midl>
+    <Midl Include="Assets\Animated\AnimatedVisuals.RobotSleepAnim.idl">
+      <Filter>Assets\Animated\RobotSleep</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
+    <ClCompile Include="LinkWithRobot.cpp" />
+    <ClCompile Include="Assets\Animated\AnimatedVisuals.CheckmarkAnim.cpp">
+      <Filter>Assets\Animated\CheckMark</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Animated\AnimatedVisuals.RobotGoAnim.cpp">
+      <Filter>Assets\Animated\RobotGo</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Animated\AnimatedVisuals.RobotSleepAnim.cpp">
+      <Filter>Assets\Animated\RobotSleep</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="LinkWithRobot.h" />
+    <ClInclude Include="Assets\Animated\AnimatedVisuals.CheckmarkAnim.h">
+      <Filter>Assets\Animated\CheckMark</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Animated\AnimatedVisuals.RobotGoAnim.h">
+      <Filter>Assets\Animated\RobotGo</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Animated\AnimatedVisuals.RobotSleepAnim.h">
+      <Filter>Assets\Animated\RobotSleep</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\StoreLogo.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square150x150Logo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.scale-400.png" />
+    <Image Include="Assets\BadgeLogo.scale-400.png" />
+    <Image Include="Assets\RobotSleep.png">
+      <Filter>Assets</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{677a98ba-a08b-4591-9b1d-1b874bccdbe1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Animated">
+      <UniqueIdentifier>{ed185395-513b-4bd5-9564-5a89b1c35499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Animated\CheckMark">
+      <UniqueIdentifier>{feff922b-55b5-4d15-9f12-9476859048d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Animated\RobotGo">
+      <UniqueIdentifier>{a5d5ea97-c953-4c6d-87ad-fd7a0230ee09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Animated\RobotSleep">
+      <UniqueIdentifier>{216806ec-a115-44d3-9f2d-a21618057e5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Video">
+      <UniqueIdentifier>{48ac7580-d070-4dbf-bd25-1d3f808c4a31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Htmls">
+      <UniqueIdentifier>{5add8b04-8a27-455f-b8ce-3973a1028b3f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="app.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="TLTC (winUi3)_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\..\Users\Даниил Сергей\Downloads\Telegram Desktop\BluetoothDriver.py">
+      <Filter>Assets</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Assets\Video\Hollow knight.mp4">
+      <Filter>Assets\Video</Filter>
+    </Media>
+    <Media Include="Assets\ParellParkRutube.html">
+      <Filter>Assets\Htmls</Filter>
+    </Media>
+    <Media Include="Assets\GarageParkRutube.html">
+      <Filter>Assets\Htmls</Filter>
+    </Media>
+    <Media Include="Assets\Video\Mountain.mp4">
+      <Filter>Assets\Video</Filter>
+    </Media>
+    <Media Include="Assets\Video\Start.mp4">
+      <Filter>Assets\Video</Filter>
+    </Media>
+    <Media Include="Assets\Video\End.mp4">
+      <Filter>Assets\Video</Filter>
+    </Media>
+    <Media Include="Assets\Video\Garage.mp4">
+      <Filter>Assets\Video</Filter>
+    </Media>
+    <Media Include="Assets\Video\Turn.mp4">
+      <Filter>Assets\Video</Filter>
+    </Media>
+    <Media Include="Assets\Video\ParellPark.mp4">
+      <Filter>Assets\Video</Filter>
+    </Media>
+  </ItemGroup>
+</Project>

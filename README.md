@@ -37,5 +37,5 @@ code --install-extension VEXRobotics.vexcode
 code .
 ```
 #### Сборка
-![Сборка](Запись-2025-02-12-094851.gif)
+![Сборка](Assets/Запись-2025-02-12-094851.gif)
 

@@ -1,0 +1,10 @@
+namespace TLTC__winUi3_
+{
+    [default_interface]
+    runtimeclass Home : Microsoft.UI.Xaml.Controls.Page
+    {
+        Home();
+        Int32 MyProperty;
+    }
+
+}

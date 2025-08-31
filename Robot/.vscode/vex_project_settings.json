@@ -1,0 +1,19 @@
+{
+	"extension": {
+		"version": "0.6.1",
+		"json": 2
+	},
+	"project": {
+		"name": "AutoDriveBot",
+		"description": "",
+		"creationDate": "25.01.2025, 10:45:31",
+		"platform": "IQ2",
+		"language": "cpp",
+		"slot": 8,
+		"sdkVersion": "IQ2_20231003_10_00_00",
+		"cpp": {
+			"includePath": [],
+			"printf_float": false
+		}
+	}
+}

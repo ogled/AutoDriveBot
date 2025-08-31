@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="TLTC__winUi3_.MainPageApp"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TLTC__winUi3_"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:winui="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    mc:Ignorable="d">
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <MenuBar Grid.Row="0" Padding="8">
+            <MenuBarItem Title="Робот">
+                <MenuFlyoutItem Text="Изменить цвет фар" Click="ChangeColor_Click"/>
+            </MenuBarItem>
+
+            <MenuBarItem Title="Вид">
+                <ToggleMenuFlyoutItem x:Name="ProMode" Text="PRO режим" IsChecked="False" Click="ProMode_Click"/>
+                <ToggleMenuFlyoutItem x:Name="IsAreTransportControlsEnabled" Text="Включать упровление плеером" IsChecked="False" Click="IsAreTransportControlsEnabled_Click"/>
+                <MenuFlyoutSeparator/>
+                <ToggleMenuFlyoutItem x:Name="ToggleSound" Click="ToggleSound_Click" Text="Включать озвучку" IsChecked="False"/>
+                <MenuFlyoutItem Text="Настройка озвучки" Click="ToggleMenuFlyoutItem_Click"/>
+            </MenuBarItem>
+
+            <MenuBarItem Title="Справка">
+                <MenuFlyoutItem Text="О программе" Click="MenuFlyoutItem_Click"/>
+                <MenuFlyoutSubItem Text="Для разработчиков">
+                    <MenuFlyoutItem Text="Открыть папку программы" x:Name="DeveloperOpenFolder" Click="DeveloperOpenFolder_Click"/>
+                    <MenuFlyoutItem Text="Эмулировать команду робота" x:Name="DeveloperRobotEmulated" Click="DeveloperRobotEmulated_Click"/>
+                </MenuFlyoutSubItem>
+
+            </MenuBarItem>
+        </MenuBar>
+
+        <winui:ContentDialog x:Name="ColorPickerDialog" Title="Выберите цвет" PrimaryButtonText="Применить" SecondaryButtonText="Отмена">
+            <winui:ContentDialog.Content>
+                <StackPanel>
+                    <winui:ColorPicker x:Name="ColorPicker" />
+                </StackPanel>
+            </winui:ContentDialog.Content>
+        </winui:ContentDialog>
+        
+        <ContentDialog x:Name="SoundSettings" Title="Настройка озвучки" PrimaryButtonClick="OnPrimaryButtonClick" PrimaryButtonText="Сохранить" CloseButtonText="Отмена" DefaultButton="Primary">
+            <StackPanel Spacing="12">
+                <ComboBox x:Name="VoiceComboBox" Header="Выберите голос"/>
+                <TextBox x:Name="TestTextBox" Header="Тестовый текст" Text="Привет, мир!"/>
+                <Button Content="Проверить озвучку" Click="OnTestVoiceClicked"/>
+            </StackPanel>
+        </ContentDialog>
+
+        <ContentDialog x:Name="DeveloperRobotEmulatedDialog" Title="Эмулировать команду робота" PrimaryButtonText="Ok" DefaultButton="Primary">
+            <StackPanel Spacing="12">
+                <TextBox x:Name="ComandToRobotDeveloperComboBox" PlaceholderText="Введите команду"/>
+                <Button Content="Отправить" Click="Button_Click"/>
+            </StackPanel>
+        </ContentDialog>
+        
+        <winui:ContentDialog x:Name="AboutDialog"
+               Title="О программе"
+               PrimaryButtonText="Закрыть">
+            <Grid >
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+            
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Image Grid.RowSpan="2" Source="ms-appx:///Assets/Square150x150Logo.scale-200.png" Width="100" Height="100" HorizontalAlignment="Left" Grid.Column="0" Margin="0,0,16,0"/>
+
+                <TextBlock Text="Программа разработана для обучения курсантов на вождения с помощью спецелизированного работа" Grid.Column="1"
+                   TextWrapping="Wrap" 
+                   Margin="0,10,0,0" 
+                   HorizontalAlignment="Right"/>
+                <HyperlinkButton Content="Ссылка на GitHub проекта" NavigateUri="https://github.com/ogled/AutoDriveBot" Grid.Row="1" HorizontalAlignment="Left" Grid.Column="1"/>
+
+            </Grid>
+        </winui:ContentDialog>
+
+        <Grid Margin="8" x:Name="ProModeGrid" Visibility="Collapsed" IsHitTestVisible="False" Grid.Row="1"
+        VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2" >
+                <TextBox x:Name="ConsoleOutput"
+             Text="> Робот подключен, ожидание команд&#x0a; "
+             IsReadOnly="True"
+             FontFamily="Consolas"
+             FontSize="14"
+             TextWrapping="Wrap"
+             Background="Black"
+             Foreground="Lime"
+             BorderBrush="Transparent"
+             Padding="8"
+             AcceptsReturn="True"
+             VerticalAlignment="Stretch"
+             Grid.Row="0"/>
+            </ScrollViewer>
+            <RichEditBox Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" PlaceholderText="Введите текст для отправки в робота" x:Name="SendTextBox"
+                 VerticalAlignment="Bottom"
+                 Width="Auto"
+                 MinWidth="200"
+                 Margin="0,4,8,0"
+                 />
+            <Button Grid.Column="1" Margin="8,8,0,0" Grid.Row="1" Content="Отправить" HorizontalAlignment="Right" Click="SendButton_Click" Style="{StaticResource AccentButtonStyle}"/>
+        </Grid>
+
+        <Grid x:Name="StandartModeGrid" Visibility="Visible" IsHitTestVisible="True" Grid.Row="1"
+        VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+
+            <Grid Margin="16,16,16,0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="20" Grid.Column="0" Grid.Row="0" CornerRadius="8">
+                <!--Карточка вторая-->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Езда по прямой" x:Name="MainText" Grid.Row="0"
+               Style="{StaticResource TitleTextBlockStyle}"
+               FontSize="28"
+               Margin="0,0,0,16"
+               HorizontalAlignment="Left"/>
+                <Border CornerRadius="12" BorderBrush="Gray" BorderThickness="1" Grid.Row="1">
+                    <Grid>
+                        <!-- 1. Lottie Player -->
+                        <AnimatedVisualPlayer 
+                            x:Name="LottiePlayer"
+                            MinHeight="300"
+                            MinWidth="400"       
+                            Stretch="UniformToFill"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            AutoPlay="True"
+                        />
+                        <!-- 2. Static Image -->
+                        <Image 
+                            x:Name="StaticPngImage"
+                            Visibility="Collapsed"
+                            MinHeight="300"
+                            MinWidth="400"
+                            Stretch="Uniform"
+                                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                        />
+                        <!-- 3. MP4 Video -->
+                        <MediaPlayerElement
+                            x:Name="Mp4Player"
+                            Visibility="Collapsed"
+                            AutoPlay="True"
+                            Stretch="Uniform"
+                            MinHeight="300"                                
+                            MinWidth="400"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center" 
+                        />
+                        <!-- 4. YouTube WebView -->
+                        <WebView2 
+                            x:Name="YoutubeView"
+                            Visibility="Collapsed"
+                            MinHeight="300"
+                            MinWidth="400"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch"
+                        />
+                    </Grid>
+                </Border>
+            </Grid>
+            
+            <Grid Margin="16,16,16,16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="20" Grid.Column="0" Grid.Row="1" CornerRadius="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Шаг" Style="{StaticResource SubtitleTextBlockStyle}" Grid.Row="0"/>
+                    <ListView Grid.Row="1"
+              x:Name="StepsList" SelectedIndex="0" SelectionChanged="StepsList_SelectionChanged">
+                    </ListView>
+                </Grid>
+
+                <Grid Grid.Column="1" Grid.RowSpan="2">
+                <!--Карточка третья-->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Margin="16,16,16,16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="20"  Grid.Row="0" CornerRadius="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Дополнительная информация" Style="{StaticResource SubtitleTextBlockStyle}" Grid.Row="0" Margin="0,0,0,8"/>
+                    <TextBlock x:Name="OtherInfirmation" Style="{StaticResource BodyTextBlockStyle}" Grid.Row="1" TextWrapping="WrapWholeWords"/>
+                </Grid>
+                
+                <Grid Margin="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="20" Grid.Row="1" CornerRadius="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Панель статусов" Style="{StaticResource SubtitleTextBlockStyle}" Grid.Row="0" Margin="0,0,0,16"/>
+                    <StackPanel Orientation="Horizontal" Spacing="12" Grid.Row="1" VerticalAlignment="Top">
+                        <!-- Скорость -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                CornerRadius="8"
+                Padding="12"
+                Width="120"
+                Height="100">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xEC48;" FontFamily="Segoe MDL2 Assets" FontSize="28" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Скорость" FontWeight="SemiBold" FontSize="14" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                <TextBlock Text="0 мм/с" x:Name="SpeedText" FontSize="12" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Угол поворота -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                CornerRadius="8"
+                Padding="12"
+                Width="120"
+                Height="100">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="28" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Поворот" FontWeight="SemiBold" FontSize="14" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                <TextBlock Text="0°" x:Name="AngleText" FontSize="12" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Батарея -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                CornerRadius="8"
+                Padding="12"
+                Width="120"
+                Height="100">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE857;" FontFamily="Segoe MDL2 Assets" FontSize="28" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Батарея" FontWeight="SemiBold" FontSize="14" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                <TextBlock Text="100%" x:Name="BatteryText" FontSize="12" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Grid.Row="1" VerticalAlignment="Bottom"
+                        CornerRadius="8"
+                        Padding="12"
+                        Width="240"
+                        Height="120">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock  Text="Программа робота" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                            <StackPanel Orientation="Horizontal" Spacing="12" Grid.Row="2" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center">
+                                <!-- Стоп -->
+                                <Button x:Name="StopButton"
+                                Width="56"
+                                Height="56"
+                                CornerRadius="8" ToolTipService.ToolTip="Остоновить"
+                                Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                Click="StopButton_Click" IsEnabled="False">
+                                    <FontIcon Glyph="&#xE978;" FontSize="20"/>
+                                </Button>
+                                
+                                <!-- Пауза / Продолжить -->
+                                <Button x:Name="PauseResumeButton"
+                                Width="56"
+                                Height="56"
+                                CornerRadius="8" ToolTipService.ToolTip="Приостоновить"
+                                Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                Click="PauseResumeButton_Click" IsEnabled="False">
+                                    <FontIcon x:Name="PauseResumeIcon" Glyph="&#xF8AE;" FontSize="20"/>
+                                </Button>
+
+                                <!-- Шаг до следующей задачи -->
+                                <Button x:Name="ForNextContinueButton"
+                                Width="56"
+                                Height="56"
+                                CornerRadius="8" ToolTipService.ToolTip="Шаг до следующей задачи"
+                                Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                Click="ForNextContinueButton_Click" IsEnabled="False">
+                                    <FontIcon x:Name="ForNextContinueIcon" Glyph="&#xF8AD;" FontSize="20"/>
+                                </Button>
+
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
