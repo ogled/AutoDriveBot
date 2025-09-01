@@ -117,7 +117,8 @@
 		"thread": "cpp",
 		"typeinfo": "cpp",
 		"variant": "cpp",
-		"map": "cpp"
+		"map": "cpp",
+		"cstring": "cpp"
 	},
 	"C_Cpp.codeAnalysis.diagnosticSuppressions": [
 		"135"

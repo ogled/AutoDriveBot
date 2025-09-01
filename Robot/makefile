@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# VEXcode makefile 2019_03_26_01
-
 # show compiler output
 VERBOSE = 0
 

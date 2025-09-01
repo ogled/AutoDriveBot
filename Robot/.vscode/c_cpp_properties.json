@@ -1,6 +1,6 @@
 {
 	"env": {
-		"vex_compilerPath": "${config:vexrobotics.vexcode.Cpp.Toolchain.Path}\\clang\\bin\\clang",
+		"vex_compilerPath": "${config:vexrobotics.vexcode.Cpp.Toolchain.Path}\\clang\\bin\\clang.exe",
 		"vex_sdkPath": "${config:vexrobotics.vexcode.Cpp.Sdk.Home}\\IQ2\\IQ2_20231003_10_00_00\\vexiq2",
 		"vex_gcc": "${vex_sdkPath}/gcc/include/c++/7.3.1",
 		"vex_sdkIncludes": [
@@ -14,18 +14,5 @@
 			"${config:vexrobotics.vexcode.Cpp.Sdk.Home}/IQ2/IQ2_20231003_10_00_00/vexiq2/include/**"
 		]
 	},
-	"configurations": [
-		{
-			"name": "windows-g++-x64",
-			"includePath": [
-				"${workspaceFolder}/**",
-				"${config:vexrobotics.vexcode.Cpp.Sdk.Home}/IQ2/IQ2_20231003_10_00_00/vexiq2/include/**"
-			],
-			"compilerPath": "${workspaceFolder}/../../MSYS2/usr/bin/g++.exe",
-			"cStandard": "${default}",
-			"cppStandard": "c++20",
-			"intelliSenseMode": "windows-gcc-x64"
-		}
-	],
 	"version": 4
 }
