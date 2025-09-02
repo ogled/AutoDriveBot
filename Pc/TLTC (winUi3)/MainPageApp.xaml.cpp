@@ -1,4 +1,4 @@
-#include "pch.h"
+п»ї#include "pch.h"
 #include "MainPageApp.xaml.h"
 #if __has_include("MainPageApp.g.cpp")
 #include "MainPageApp.g.cpp"
@@ -8,6 +8,9 @@
 #include <winrt/Windows.UI.Text.h>
 #include <winrt/Windows.UI.h>
 #include <winrt/Windows.Storage.h>
+#include <winrt/Microsoft.UI.Windowing.h>
+#include <winrt/Microsoft.UI.Interop.h>
+#include <winrt/Windows.Graphics.h>
 #include "Assets/Animated/AnimatedVisuals.RobotGoAnim.h"
 #include "Assets/Animated/AnimatedVisuals.RobotSleepAnim.h"
 #include <fstream>
@@ -21,6 +24,11 @@
 #include <shellapi.h>;
 #include <cstdlib>
 #include <winrt/Microsoft.Web.WebView2.Core.h>
+#include <winrt/Windows.UI.Core.h>
+#include <microsoft.ui.xaml.window.h>
+#include <windowsx.h>
+#include "KeyHandler.h"
+#include <winrt/Windows.Gaming.Input.h>
 
 #pragma comment(lib, "Shell32.lib")
 
@@ -31,6 +39,7 @@ using json = nlohmann::json;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
+
 
 namespace winrt::TLTC__winUi3_::implementation
 {
@@ -163,6 +172,7 @@ winrt::Windows::UI::Color winrt::TLTC__winUi3_::implementation::MainPageApp::Loa
 
 void winrt::TLTC__winUi3_::implementation::MainPageApp::RobotCheckState(std::vector<std::wstring> args)
 {
+    StopButton().IsEnabled(true);
     link->sendMesenge("connectTrue();");
     Sleep(300);
     StopButton().IsEnabled(true);
@@ -176,16 +186,22 @@ void winrt::TLTC__winUi3_::implementation::MainPageApp::RobotCheckState(std::vec
     std::string b = std::to_string(selectedColor.B);
 
     link->sendMesenge("rgb(" + r + "," + g + "," + b + ");");
+
+
+    if (isJoysticMode)
+    {
+        Sleep(300);
+        auto fakeArgs = winrt::Microsoft::UI::Xaml::RoutedEventArgs();
+        RobotJoystick_Click(RobotJoystick(), fakeArgs);
+    }
 }
 //State(speed,angle,battery);
-void winrt::TLTC__winUi3_::implementation::MainPageApp::FromRobotState(std::vector<std::wstring> args)
+void winrt::TLTC__winUi3_::implementation::MainPageApp::FromRobotState()
 {
-    if (args.size() >= 3)
-    {
-        SpeedText().Text(args[0] + L" мм/с");
-        AngleText().Text(args[1] + L"°");
-        BatteryText().Text(args[2] + L"%");
-    }
+    SpeedText().Text(winrt::to_hstring(sensorsValues[0]) + L" РјРј/СЃ");
+    AngleText().Text(winrt::to_hstring(sensorsValues[1]) + L" В°");
+    BatteryText().Text(winrt::to_hstring(sensorsValues[2]) + L" %");
+    WheelAngleText().Text(winrt::to_hstring(sensorsValues[4]) + L" В°");
 }
 winrt::Windows::Foundation::IAsyncAction winrt::TLTC__winUi3_::implementation::MainPageApp::PlayText(winrt::hstring text)
 {
@@ -213,7 +229,7 @@ winrt::Windows::Foundation::IAsyncAction winrt::TLTC__winUi3_::implementation::M
             stream = co_await synthesizer.SynthesizeSsmlToStreamAsync(winrt::to_hstring(str2));
         }
         catch (winrt::hresult_error const& ex) {
-            OutputDebugStringW((L"Ошибка синтеза: " + ex.message()).c_str());
+            OutputDebugStringW((L"РћС€РёР±РєР° СЃРёРЅС‚РµР·Р°: " + ex.message()).c_str());
             co_return;
         }
     }
@@ -229,6 +245,29 @@ winrt::Windows::Foundation::IAsyncAction winrt::TLTC__winUi3_::implementation::M
 
     m_player.SetStreamSource(stream);
     m_player.Play();
+}
+
+void winrt::TLTC__winUi3_::implementation::MainPageApp::joysticStart()
+{
+    if (!joystick.isInitialize)
+    {
+        if (joystick.Initialize()) {
+            OutputDebugStringW(L"Joystick connected");
+
+            Microsoft::UI::Xaml::DispatcherTimer timer;
+            timer.Interval(std::chrono::milliseconds(delaySendControllerState));
+            timer.Tick([this](auto&&, auto&&) {
+                for (auto& msg : joystick.Update()) {
+                    link->sendMesenge(msg);
+                    OutputDebugStringA(("Joystic change: " + msg).c_str());
+                }
+                });
+            timer.Start();
+        }
+        else {
+            OutputDebugStringW(L"No joystick found");
+        }
+    }
 }
 
 void winrt::TLTC__winUi3_::implementation::MainPageApp::parse_config_file(const std::string& filename)
@@ -354,10 +393,7 @@ winrt::TLTC__winUi3_::implementation::MainPageApp::MainPageApp()
             this->RobotCheckState(args);
         }},
         {L"msg", [this](std::vector<std::wstring> args) {
-            MessageBoxW(nullptr, args[0].c_str(), L"Сообщение от робота", MB_OK);
-        }},
-        {L"State", [this](std::vector<std::wstring> args) {
-            this->FromRobotState(args);
+            MessageBoxW(nullptr, args[0].c_str(), L"РЎРѕРѕР±С‰РµРЅРёРµ РѕС‚ СЂРѕР±РѕС‚Р°", MB_OK);
         }},
         {L"SleepRobot", [this](std::vector<std::wstring> args) {
             this->SleepRobotState(args);
@@ -367,12 +403,14 @@ winrt::TLTC__winUi3_::implementation::MainPageApp::MainPageApp()
      if (!m_timer)
      {
          m_timer = winrt::Microsoft::UI::Xaml::DispatcherTimer();
-         m_timer.Interval(std::chrono::milliseconds(60));
+         m_timer.Interval(std::chrono::milliseconds(5));
          m_timer.Tick({ this, &MainPageApp::checkValueFromRobot });
      }
      m_timer.Start();
 
+     s_instance = this;
 
+     joysticStart();
 }
 
 winrt::TLTC__winUi3_::implementation::MainPageApp::~MainPageApp()
@@ -415,6 +453,43 @@ void winrt::TLTC__winUi3_::implementation::MainPageApp::checkValueFromRobot(winr
                 if (i == 0)
                 {
                     std::wstring command = link->fromRobot.front().substr(link->fromRobot.front().find(L"RECEIVED: ") + 10);
+
+                    if (command.rfind(L"S:", 0) == 0)
+                    {
+                        size_t commaPos = command.find(L',');
+                        if (commaPos != std::wstring::npos)
+                        {
+                            std::wstring sensorPart = command.substr(2, commaPos - 2);
+                            int sensorIndex = -1;
+                            if (!sensorPart.empty() && sensorPart[0] == L's')
+                            {
+                                sensorIndex = std::stoi(sensorPart.substr(1));
+                            }
+
+                            std::wstring valuePart = command.substr(commaPos + 1);
+                            int sensorValue = std::stoi(valuePart);
+
+                            sensorsValues[sensorIndex] = sensorValue;
+
+                            ConsoleOutput().Text(ConsoleOutput().Text() +
+                                L"> Sensor " + std::to_wstring(sensorIndex) +
+                                L" = " + std::to_wstring(sensorValue) + L"\n");
+
+                            auto scrollViewer = ConsoleOutput().FindName(L"ScrollViewer").as<winrt::Microsoft::UI::Xaml::Controls::ScrollViewer>();
+                            if (scrollViewer)
+                            {
+                                scrollViewer.ChangeView(nullptr, scrollViewer.ScrollableHeight(), nullptr);
+                            }
+                            OutputDebugStringW((L"Sensor change: " + command).c_str());
+
+                            FromRobotState();
+                            break;
+                        }
+                    }
+                }
+                else if (i == 1)
+                {
+                    std::wstring command = link->fromRobot.front().substr(link->fromRobot.front().find(L"RECEIVED: ") + 10);
                     size_t parenOpen = command.find(L'(');
                     size_t parenClose = command.find(L')');
                     size_t semicolon = command.find(L';');
@@ -450,7 +525,7 @@ void winrt::TLTC__winUi3_::implementation::MainPageApp::checkValueFromRobot(winr
                     it->second(args);
                     break;
                 }
-                else if (i == 1)
+                else if (i == 2)
                 {
                     std::wstring command = link->fromRobot.front().substr(link->fromRobot.front().find(L"RECEIVED: ") + 10);
                     size_t parenOpen = command.find(L'(');
@@ -488,44 +563,57 @@ void winrt::TLTC__winUi3_::implementation::MainPageApp::checkValueFromRobot(winr
                     StepsList().SelectedIndex(0);
                     StepsList_SelectionChanged(nullptr, nullptr);
                     std::string image = it.image;
-                    
-                    if (Mp4Player().MediaPlayer() != nullptr)
+
+                    DispatcherQueue().TryEnqueue([=]() {
+                        try { LottiePlayer().Source(nullptr); }
+                        catch (...) {}
+                        try { if (auto mp = Mp4Player().MediaPlayer()) mp.Source(nullptr); }
+                        catch (...) {}
+                        try { StaticPngImage().Source(nullptr); }
+                        catch (...) {}
+                        try { YoutubeView().Source(nullptr); }
+                        catch (...) {}
+                        try { LottiePlayer().Visibility(Visibility::Collapsed); }
+                        catch (...) {}
+                        try { Mp4Player().Visibility(Visibility::Collapsed); }
+                        catch (...) {}
+                        try { StaticPngImage().Visibility(Visibility::Collapsed); }
+                        catch (...) {}
+                        try { YoutubeView().Visibility(Visibility::Collapsed); }
+                        catch (...) {}
+                        });
+
+                    if (image.find("AnimatedVisuals::") != std::string::npos)
                     {
-                        try
-                        {
-                            auto currentSource = Mp4Player().Source();
-                            if (currentSource != nullptr)
-                            {
-                                Mp4Player().MediaPlayer().Close();
+                        image.erase(0, image.find("AnimatedVisuals::") + sizeof("AnimatedVisuals::") - 1);
+
+                        DispatcherQueue().TryEnqueue([image, this]() {
+                            try {
+                                LottiePlayer().Visibility(Visibility::Visible);
+                                if (image == "RobotGoAnim") {
+                                    LottiePlayer().Source(AnimatedVisuals::RobotGoAnim());
+                                }
+                                
                             }
-                        }
-                        catch (...){}
-                    }
-                    if (image.find("AnimatedVisuals::") != -1)
-                    {
-                        StaticPngImage().Visibility(Visibility::Collapsed);
-                        Mp4Player().Visibility(Visibility::Collapsed);
-                        YoutubeView().Visibility(Visibility::Collapsed);
-                        LottiePlayer().Visibility(Visibility::Visible);
-                        image.erase(0, image.find("AnimatedVisuals::") + 17);
-                        if (image == "RobotGoAnim")
-                        {
-                            LottiePlayer().Source(AnimatedVisuals::RobotGoAnim());
-                        }
+                            catch (...) {}
+                            });
                     }
                     else if (!image.empty())
                     {
                         std::string ext = "";
-                        size_t dotPos = image.find_last_of(".");
-                        if (dotPos != std::wstring::npos) {
+                        size_t dotPos = image.find_last_of('.');
+                        if (dotPos != std::string::npos) {
                             ext = image.substr(dotPos);
                             std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
                         }
 
-                        const std::vector<std::string> videoAndAudioExts = { ".mp4", ".mov", ".webm", ".avi", ".wmv", ".mkv", ".m4v", ".mpg", ".mpeg", ".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", ".m4a" };
-
-                        const std::vector<std::string> imageExts = { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".webp", ".tif", ".tiff" };
-                        
+                        const std::vector<std::string> videoAndAudioExts = {
+                            ".mp4", ".mov", ".webm", ".avi", ".wmv", ".mkv", ".m4v", ".mpg", ".mpeg",
+                            ".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", ".m4a"
+                        };
+                        const std::vector<std::string> imageExts = {
+                            ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".webp", ".tif", ".tiff"
+                        };
                         const std::vector<std::string> urlExts = { "https", "http", "file" };
 
                         bool isVideo = std::find(videoAndAudioExts.begin(), videoAndAudioExts.end(), ext) != videoAndAudioExts.end();
@@ -534,8 +622,8 @@ void winrt::TLTC__winUi3_::implementation::MainPageApp::checkValueFromRobot(winr
 
                         if (!isVideo && !isImage)
                         {
-                            dotPos = image.find_first_of(":");
-                            if (dotPos != std::wstring::npos) {
+                            dotPos = image.find_first_of(':');
+                            if (dotPos != std::string::npos) {
                                 ext = image.substr(0, dotPos);
                                 std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
                             }
@@ -544,72 +632,77 @@ void winrt::TLTC__winUi3_::implementation::MainPageApp::checkValueFromRobot(winr
 
                         if (isVideo)
                         {
-                            // Скрытие всех, отображение только плеера
-                            LottiePlayer().Visibility(Visibility::Collapsed);
-                            StaticPngImage().Visibility(Visibility::Collapsed);
-                            YoutubeView().Visibility(Visibility::Collapsed);
-                            Mp4Player().Visibility(Visibility::Visible);
-                            Mp4Player().UpdateLayout();
+                            DispatcherQueue().TryEnqueue([image, this]() {
+                                try {
+                                    LottiePlayer().Visibility(Visibility::Collapsed);
+                                    StaticPngImage().Visibility(Visibility::Collapsed);
+                                    YoutubeView().Visibility(Visibility::Collapsed);
+                                    Mp4Player().Visibility(Visibility::Visible);
+                                    Mp4Player().UpdateLayout();
 
-                            auto mediaPlayer = winrt::Windows::Media::Playback::MediaPlayer();
-                            mediaPlayer.IsLoopingEnabled(true);
-                            mediaPlayer.IsMuted(true);
-                            mediaPlayer.AutoPlay(false);
+                                    auto mediaPlayer = winrt::Windows::Media::Playback::MediaPlayer();
+                                    mediaPlayer.IsLoopingEnabled(true);
+                                    mediaPlayer.IsMuted(true);
+                                    mediaPlayer.AutoPlay(false);
 
-                            // Устанавливаем MediaPlayer в элемент
-                            Mp4Player().SetMediaPlayer(mediaPlayer);
+                                    Mp4Player().SetMediaPlayer(mediaPlayer);
 
-                            // Загружаем видео
-                            winrt::hstring hpath = L"ms-appx:///" + winrt::to_hstring(image);
-                            auto source = winrt::Windows::Media::Core::MediaSource::CreateFromUri(winrt::Windows::Foundation::Uri(hpath));
-                            mediaPlayer.Source(source);
+                                    winrt::hstring hpath = L"ms-appx:///" + winrt::to_hstring(image);
+                                    auto source = winrt::Windows::Media::Core::MediaSource::CreateFromUri(winrt::Windows::Foundation::Uri(hpath));
+                                    mediaPlayer.Source(source);
 
-                            // Запускаем воспроизведение — только из UI-потока
-                            DispatcherQueue().TryEnqueue([mediaPlayer]() {
-                                mediaPlayer.Play();
+                                    mediaPlayer.Play();
+                                }
+                                catch (...) {}
                                 });
-
                         }
                         else if (isUrl)
                         {
-                            LottiePlayer().Visibility(Visibility::Collapsed);
-                            StaticPngImage().Visibility(Visibility::Collapsed);
-                            Mp4Player().Visibility(Visibility::Collapsed);
-                            YoutubeView().Visibility(Visibility::Visible);
+                            DispatcherQueue().TryEnqueue([image, ext, this]() {
+                                try {
+                                    LottiePlayer().Visibility(Visibility::Collapsed);
+                                    StaticPngImage().Visibility(Visibility::Collapsed);
+                                    Mp4Player().Visibility(Visibility::Collapsed);
+                                    YoutubeView().Visibility(Visibility::Visible);
 
-                            if (ext == "file")
-                            {
-                                const std::string msAppxPrefix = "{ms-appx:///}";
-                                size_t pos = 0;
-
-                                while ((pos = image.find(msAppxPrefix, pos)) != std::string::npos) {
-
-                                    std::string relativePath = image.substr(pos + msAppxPrefix.length());
-
-                                    // Получаем полный путь к файлу в Package
-                                    auto folder = winrt::Windows::ApplicationModel::Package::Current().InstalledLocation();
-                                    std::string fullPath = winrt::to_string(folder.Path()).c_str();
-
-                                    fullPath += "\\" + relativePath;
-
-                                    image.replace(pos, msAppxPrefix.length() + relativePath.length(), fullPath);
-                                    pos += fullPath.length();
+                                    std::string localImage = image;
+                                    if (ext == "file")
+                                    {
+                                        const std::string msAppxPrefix = "{ms-appx:///}";
+                                        size_t pos = 0;
+                                        while ((pos = localImage.find(msAppxPrefix, pos)) != std::string::npos) {
+                                            std::string relativePath = localImage.substr(pos + msAppxPrefix.length());
+                                            auto folder = winrt::Windows::ApplicationModel::Package::Current().InstalledLocation();
+                                            std::string fullPath = winrt::to_string(folder.Path());
+                                            fullPath += "\\" + relativePath;
+                                            localImage.replace(pos, msAppxPrefix.length() + relativePath.length(), fullPath);
+                                            pos += fullPath.length();
+                                        }
+                                    }
+                                    YoutubeView().Source(winrt::Windows::Foundation::Uri{ winrt::to_hstring(localImage) });
                                 }
-                            }
-                            YoutubeView().Source(winrt::Windows::Foundation::Uri{ winrt::to_hstring(image)});
+                                catch (...) {}
+                                });
                         }
                         else if (isImage)
                         {
-                            LottiePlayer().Visibility(Visibility::Collapsed);
-                            Mp4Player().Visibility(Visibility::Collapsed);
-                            YoutubeView().Visibility(Visibility::Collapsed);
-                            StaticPngImage().Visibility(Visibility::Visible);
-                            winrt::Windows::Foundation::Uri pngUri{ winrt::hstring(L"ms-appx:///" + winrt::to_hstring(image)) };
-                            winrt::Microsoft::UI::Xaml::Media::Imaging::BitmapImage bitmap;
-                            bitmap.UriSource(pngUri);
-                            StaticPngImage().Source(bitmap);
+                            DispatcherQueue().TryEnqueue([image, this]() {
+                                try {
+                                    LottiePlayer().Visibility(Visibility::Collapsed);
+                                    Mp4Player().Visibility(Visibility::Collapsed);
+                                    YoutubeView().Visibility(Visibility::Collapsed);
+                                    StaticPngImage().Visibility(Visibility::Visible);
+
+                                    winrt::Windows::Foundation::Uri pngUri{ winrt::hstring(L"ms-appx:///" + winrt::to_hstring(image)) };
+                                    winrt::Microsoft::UI::Xaml::Media::Imaging::BitmapImage bitmap;
+                                    bitmap.UriSource(pngUri);
+                                    StaticPngImage().Source(bitmap);
+                                }
+                                catch (...) {}
+                                });
                         }
                     }
+
                     if (isToggleSound)
                     {
                         PlayText(winrt::to_hstring(it.textSound));
@@ -732,4 +825,19 @@ void winrt::TLTC__winUi3_::implementation::MainPageApp::StopButton_Click(winrt::
 void winrt::TLTC__winUi3_::implementation::MainPageApp::ForNextContinueButton_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e)
 {
     link->sendMesenge("NextStep();");
+}
+
+void winrt::TLTC__winUi3_::implementation::MainPageApp::RobotJoystick_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e)
+{
+    joysticStart();
+    isJoysticMode = RobotJoystick().IsChecked();
+
+    if (isJoysticMode)
+    {
+        link->sendMesenge("StartJM();");
+    }
+    else
+    {
+        link->sendMesenge("StopJM();");
+    }
 }

@@ -4,6 +4,8 @@
 #include "LinkWithRobot.h"
 #include <winrt/Microsoft.UI.Xaml.Navigation.h>
 #include <functional>
+#include "KeyHandler.h"
+#include <JoystickManager.h>
 
 namespace winrt::TLTC__winUi3_::implementation
 {
@@ -23,23 +25,31 @@ namespace winrt::TLTC__winUi3_::implementation
             };
 
         winrt::Windows::Media::Playback::MediaPlayer m_player{ nullptr };
+
         bool isToggleSound = false;
         bool isPaused = false;
+
         winrt::Microsoft::UI::Xaml::DispatcherTimer m_timer{ nullptr };
         std::vector<Config> commandsOther;
         Config activeCommand;
-        LinkWithRobot* link;
+        KeyHandler* KH;
 
         winrt::Windows::UI::Color LoadColor();
         void parse_config_file(const std::string& filename);
         void SleepRobotState(std::vector<std::wstring> args);
         void RobotCheckState(std::vector<std::wstring> args);
-        void FromRobotState(std::vector<std::wstring> args);
+        void FromRobotState();
+        std::vector<int> sensorsValues{0,0,0,0,0};
 
         std::map<std::wstring, std::function<void(std::vector<std::wstring>)>> commands;
         winrt::Windows::Foundation::IAsyncAction PlayText(winrt::hstring text);
-
+        JoystickManager joystick;
+        const int delaySendControllerState = 67;
+        void joysticStart();
     public:
+        LinkWithRobot* link;
+
+
         MainPageApp();
         ~MainPageApp();
 
@@ -72,6 +82,10 @@ namespace winrt::TLTC__winUi3_::implementation
         void PauseResumeButton_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
         void StopButton_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
         void ForNextContinueButton_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
+        void RobotJoystick_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
+        static MainPageApp* s_instance;
+
+        bool isJoysticMode = false;
     };
 }
 

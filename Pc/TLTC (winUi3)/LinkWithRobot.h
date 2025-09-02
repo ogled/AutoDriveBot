@@ -9,13 +9,13 @@ public:
     std::wstring errorMesenge = L"";
     bool isConnected = false;
     std::queue<std::wstring> fromRobot{ std::deque<std::wstring>{L"RECEIVED: Sleep();"} };
-    std::chrono::milliseconds requestInterval{ 1000 };
     LinkWithRobot() {};
 	LinkWithRobot(std::string address);
     ~LinkWithRobot();
 private:
-    std::chrono::milliseconds timeout{ 3000 };
-
+    std::chrono::milliseconds lowtimeout{ 1600 };
+    std::chrono::milliseconds hightimeout{ 3000 };
+    HANDLE hJob = nullptr;
     std::mutex mtx;
     std::atomic<bool> shouldTerminate;
     void  LinkWithRobot::monitorData();

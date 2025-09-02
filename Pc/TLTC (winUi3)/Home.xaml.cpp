@@ -82,6 +82,10 @@ namespace winrt::TLTC__winUi3_::implementation
 
     void Home::checkValueErrorMesenge(winrt::Windows::Foundation::IInspectable const&, winrt::Windows::Foundation::IInspectable const&)
     {
+        if (link == nullptr)
+        {
+            return;
+        }
         if (!link->errorMesenge.empty())
         {
             MainErrorBar().IsOpen(true);
@@ -315,10 +319,12 @@ void winrt::TLTC__winUi3_::implementation::Home::SelectButton_Click(winrt::Windo
    {  
        Progess().IsIndeterminate(false);
        MainContent().IsHitTestVisible(false);
+       MainContent().Visibility(Visibility::Collapsed);
        Progess().IsHitTestVisible(true);
        Progess().Visibility(Visibility::Collapsed);  
        StopBleWatcher();  
-       LoadingScreen().Visibility(Visibility::Visible);  
+       LoadingScreen().Visibility(Visibility::Visible); 
+
        auto storyboard = FadeOutStoryboard();  
        storyboard.Begin();  
        auto storyboard2 = FadeInStoryboard();  
@@ -349,7 +355,12 @@ void winrt::TLTC__winUi3_::implementation::Home::SelectButton_Click(winrt::Windo
            (address >> 8) & 0xFF,
            (address >> 0) & 0xFF
        );
-       link = new LinkWithRobot(std::string(macAddressFormatted));
+       Home* self = this;
+       std::string mac = std::string(macAddressFormatted);
+
+       std::thread([self, mac]() {
+           self->link = new LinkWithRobot(mac);
+           }).detach();
    }  
 }
 

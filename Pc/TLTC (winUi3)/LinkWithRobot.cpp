@@ -34,6 +34,7 @@ LinkWithRobot::LinkWithRobot(std::string address)
         errorMesenge = L"Python не найден в PATH.";
         return;
     }
+    
     std::string pythonExe(buffer);
     winrt::Windows::Storage::StorageFolder folder = winrt::Windows::ApplicationModel::Package::Current().InstalledLocation();
     std::string fullPath = winrt::to_string(folder.Path()).c_str();
@@ -50,8 +51,8 @@ LinkWithRobot::LinkWithRobot(std::string address)
 
     hTx = CreateNamedPipeW(
         PIPE_TX,
-        PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-        PIPE_TYPE_MESSAGE | PIPE_WAIT,
+        PIPE_ACCESS_OUTBOUND,
+        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
         1, 512, 512, 0, NULL
     );
 
@@ -62,8 +63,8 @@ LinkWithRobot::LinkWithRobot(std::string address)
 
     hRx = CreateNamedPipeW(
         PIPE_RX,
-        PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
-        PIPE_TYPE_MESSAGE | PIPE_WAIT,
+        PIPE_ACCESS_INBOUND,
+        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
         1, 512, 512, 0, NULL
     );
 
@@ -89,6 +90,15 @@ LinkWithRobot::LinkWithRobot(std::string address)
         return;
     }
     Sleep(500);
+    hJob = CreateJobObject(NULL, NULL);
+
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+    jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+
+    SetInformationJobObject(hJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli));
+
+    AssignProcessToJobObject(hJob, pi.hProcess);
+    Sleep(500);
     ConnectNamedPipe(hTx, NULL);
     ConnectNamedPipe(hRx, NULL);
     shouldTerminate = false;
@@ -112,47 +122,40 @@ void  LinkWithRobot::monitorData() {
     DWORD bytesRead = 0;
 
     std::chrono::steady_clock::time_point lastResponseTime = std::chrono::steady_clock::now();
-    bool waitingForResponse = false;
     DWORD bytesAvailable = 0;
     bool isRunProgram = true;
+    bool isWaitMs = false;
     while (!shouldTerminate) {
         auto now = std::chrono::steady_clock::now();
 
-        if (!waitingForResponse && isConnected &&
-            std::chrono::duration_cast<std::chrono::milliseconds>(now - lastResponseTime) >= requestInterval) {
-            sendMesenge("GetState();");
-            waitingForResponse = true;
+        if (!isWaitMs && isConnected &&
+            std::chrono::duration_cast<std::chrono::milliseconds>(now - lastResponseTime) > lowtimeout && isRunProgram) {
+            sendMesenge("MS();");
+            isWaitMs = true;
         }
-
-        if (waitingForResponse && isConnected &&
-            std::chrono::duration_cast<std::chrono::milliseconds>(now - lastResponseTime) > timeout) {
-            if (isRunProgram == true)
-            {
-                fromRobot.push(L"RECEIVED: Sleep();");
-                fromRobot.push(L"RECEIVED: SleepRobot();");
-            }
+        else if (isConnected &&
+            std::chrono::duration_cast<std::chrono::milliseconds>(now - lastResponseTime) > hightimeout && isRunProgram)
+        {
+            fromRobot.push(L"RECEIVED: Sleep();");
+            fromRobot.push(L"RECEIVED: SleepRobot();");
             isRunProgram = false;
-            waitingForResponse = false;
-            lastResponseTime = now;
+            isWaitMs = false;
         }
 
         DWORD bytesAvailable = 0;
         if (PeekNamedPipe(hRx, NULL, 0, NULL, &bytesAvailable, NULL) && bytesAvailable > 0) {
-            if (ReadFile(hRx, buffer, sizeof(buffer) - 1, &bytesRead, NULL)) {
-                buffer[bytesRead] = '\0';
-                std::wstring wstr(buffer, buffer + bytesRead);
-                waitingForResponse = false;
-                if (wstr.find(L"State(") != -1 && wstr.find(L"GetState(") == -1)
-                {
-                    isRunProgram = true;
-                    lastResponseTime = now;
-                }
-                if (wstr.substr(0, 7) == L"ERROR: ") {
-                    errorMesenge = wstr.substr(7);
-                }
-                else {
-                    if (wstr.find(L"\n") != -1)
-                    {
+            isWaitMs = false;
+            while (bytesAvailable > 0) {
+                if (ReadFile(hRx, buffer, sizeof(buffer) - 1, &bytesRead, NULL) && bytesRead > 0) {
+                    buffer[bytesRead] = '\0';
+                    std::wstring wstr(buffer, buffer + bytesRead);
+
+                    if (wstr.rfind(L"ERROR: ", 0) == 0) {
+                        errorMesenge = wstr.substr(7);
+                    }
+                    else if(!wstr.empty()){
+                        isRunProgram = true;
+                        lastResponseTime = now;
                         std::wistringstream iss(wstr);
                         std::wstring token;
                         while (std::getline(iss, token, L'\n')) {
@@ -161,14 +164,10 @@ void  LinkWithRobot::monitorData() {
                             }
                         }
                     }
-                    else
-                    {
-                        fromRobot.push(wstr);
-                    }
                 }
+                PeekNamedPipe(hRx, NULL, 0, NULL, &bytesAvailable, NULL);
             }
         }
-
-        Sleep(10);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
 }

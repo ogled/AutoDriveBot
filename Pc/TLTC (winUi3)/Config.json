@@ -3,7 +3,7 @@
     "Title": "Езда по прямой",
     "Command": "RobotGo",
     "Image": "AnimatedVisuals::RobotGoAnim",
-    "TextSound": "<speak version=\"1.0\" xml:lang=\"ru-RU\">Следите за дорогой и не делайте резких движений рулём.</speak>",
+    "TextSound": "",
     "Steps": [
       {
         "Name": "Первый шаг",

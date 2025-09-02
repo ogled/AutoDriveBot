@@ -1,12 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="MainWindow.xaml" />
-    <Page Include="Home.xaml" />
-    <Page Include="MainPageApp.xaml" />
+    <Page Include="MainWindow.xaml">
+      <Filter>Xaml</Filter>
+    </Page>
+    <Page Include="Home.xaml">
+      <Filter>Xaml</Filter>
+    </Page>
+    <Page Include="MainPageApp.xaml">
+      <Filter>Xaml</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="MainWindow.idl" />
@@ -21,9 +24,6 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
-    <ClCompile Include="LinkWithRobot.cpp" />
     <ClCompile Include="Assets\Animated\AnimatedVisuals.CheckmarkAnim.cpp">
       <Filter>Assets\Animated\CheckMark</Filter>
     </ClCompile>
@@ -33,10 +33,21 @@
     <ClCompile Include="Assets\Animated\AnimatedVisuals.RobotSleepAnim.cpp">
       <Filter>Assets\Animated\RobotSleep</Filter>
     </ClCompile>
+    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkWithRobot.cpp">
+      <Filter>Clases</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyHandler.cpp">
+      <Filter>Clases</Filter>
+    </ClCompile>
+    <ClCompile Include="JoystickManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="LinkWithRobot.h" />
     <ClInclude Include="Assets\Animated\AnimatedVisuals.CheckmarkAnim.h">
       <Filter>Assets\Animated\CheckMark</Filter>
     </ClInclude>
@@ -46,6 +57,16 @@
     <ClInclude Include="Assets\Animated\AnimatedVisuals.RobotSleepAnim.h">
       <Filter>Assets\Animated\RobotSleep</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkWithRobot.h">
+      <Filter>Clases</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyHandler.h">
+      <Filter>Clases</Filter>
+    </ClInclude>
+    <ClInclude Include="JoystickManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
@@ -60,10 +81,14 @@
     <Image Include="Assets\Square44x44Logo.scale-200.png">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="Assets\Square44x44Logo.scale-400.png" />
-    <Image Include="Assets\BadgeLogo.scale-400.png" />
     <Image Include="Assets\RobotSleep.png">
       <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\BadgeLogo.scale-400.png">
+      <Filter>Other</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.scale-400.png">
+      <Filter>Other</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -88,29 +113,39 @@
     <Filter Include="Assets\Htmls">
       <UniqueIdentifier>{5add8b04-8a27-455f-b8ce-3973a1028b3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Xaml">
+      <UniqueIdentifier>{73e1728b-6144-4588-bc28-14ec554209af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Other">
+      <UniqueIdentifier>{80502159-8f85-466c-ab8c-625a2f7e7ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Clases">
+      <UniqueIdentifier>{b8af296c-ae2f-4e7e-998e-e168b1bf0179}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="readme.txt" />
+    <None Include="packages.config">
+      <Filter>Other</Filter>
+    </None>
+    <None Include="TLTC (winUi3)_TemporaryKey.pfx">
+      <Filter>Other</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="app.manifest" />
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter">
+      <Filter>Other</Filter>
+    </Natvis>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis">
+      <Filter>Other</Filter>
+    </Natvis>
   </ItemGroup>
   <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="TLTC (winUi3)_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
-    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter" />
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="..\..\..\Users\Даниил Сергей\Downloads\Telegram Desktop\BluetoothDriver.py">
+    <CopyFileToFolders Include="Config.json">
+      <Filter>Other</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Assets\BluetoothDriver.py">
       <Filter>Assets</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="Config.json" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Assets\Video\Hollow knight.mp4">
@@ -140,5 +175,25 @@
     <Media Include="Assets\Video\ParellPark.mp4">
       <Filter>Assets\Video</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Filter>Xaml</Filter>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="app.manifest">
+      <Filter>Other</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <Filter>Other</Filter>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt">
+      <Filter>Other</Filter>
+    </Text>
   </ItemGroup>
 </Project>

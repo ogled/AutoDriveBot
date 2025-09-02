@@ -125,6 +125,8 @@
       <DependentUpon>Home.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
+    <ClInclude Include="JoystickManager.h" />
+    <ClInclude Include="KeyHandler.h" />
     <ClInclude Include="LinkWithRobot.h" />
     <ClInclude Include="MainPageApp.xaml.h">
       <DependentUpon>MainPageApp.xaml</DependentUpon>
@@ -156,6 +158,8 @@
       <DependentUpon>Home.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
+    <ClCompile Include="JoystickManager.cpp" />
+    <ClCompile Include="KeyHandler.cpp" />
     <ClCompile Include="LinkWithRobot.cpp" />
     <ClCompile Include="MainPageApp.xaml.cpp">
       <DependentUpon>MainPageApp.xaml</DependentUpon>
@@ -224,10 +228,6 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\..\..\Users\Даниил Сергей\Downloads\Telegram Desktop\BluetoothDriver.py">
-      <FileType>Document</FileType>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(DestinationFolders)</DestinationFolders>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="Config.json">
       <FileType>Document</FileType>
     </CopyFileToFolders>
@@ -239,6 +239,9 @@
     <Media Include="Assets\Video\ParellPark.mp4" />
     <Media Include="Assets\Video\Start.mp4" />
     <Media Include="Assets\Video\Turn.mp4" />
+    <CopyFileToFolders Include="Assets\BluetoothDriver.py">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="packages.config" />
     <None Include="TLTC (winUi3)_TemporaryKey.pfx" />
   </ItemGroup>
