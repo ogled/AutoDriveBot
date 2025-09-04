@@ -108,8 +108,8 @@
             x:Name="AboutDialog"
             Title="О программе"
             PrimaryButtonText="Закрыть">
-            <Grid>
 
+            <Grid Margin="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -117,30 +117,60 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
+
                 <Image
-                    Grid.RowSpan="2"
+                    Grid.RowSpan="3"
                     Grid.Column="0"
-                    Width="100"
-                    Height="100"
+                    Width="80"
+                    Height="80"
                     Margin="0,0,16,0"
-                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
                     Source="ms-appx:///Assets/Square150x150Logo.scale-200.png" />
 
                 <TextBlock
+                    Grid.Row="0"
                     Grid.Column="1"
-                    Margin="0,10,0,0"
-                    HorizontalAlignment="Right"
-                    Text="Программа разработана для обучения курсантов на вождения с помощью спецелизированного работа"
-                    TextWrapping="Wrap" />
+                    Margin="0,0,0,12"
+                    FontSize="14"
+                    TextWrapping="Wrap">
+                    <Run Text="Программа разработана для обучения курсантов вождению с помощью специализированного робота." />
+                </TextBlock>
+
                 <HyperlinkButton
                     Grid.Row="1"
                     Grid.Column="1"
                     HorizontalAlignment="Left"
-                    Content="Ссылка на GitHub проекта"
-                    NavigateUri="https://github.com/ogled/AutoDriveBot" />
+                    Background="{StaticResource ControlFillColorTertiaryBrush}"
+                    NavigateUri="https://github.com/ogled/AutoDriveBot">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Image
+                            Width="20"
+                            Height="20"
+                            Source="ms-appx:///Assets/Github-logo.svg" />
+                        <TextBlock FontSize="14" Text="Source" />
+                    </StackPanel>
+                </HyperlinkButton>
 
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    FontSize="12"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap">
+                    <Run Text="Icons by " />
+                    <Hyperlink NavigateUri="https://icons8.com/">
+                        Icon8
+                    </Hyperlink>
+                    <Run Text=" and " />
+                    <Hyperlink NavigateUri="https://lottiefiles.com/">
+                        LottieFiles
+                    </Hyperlink>
+                </TextBlock>
             </Grid>
         </winui:ContentDialog>
 

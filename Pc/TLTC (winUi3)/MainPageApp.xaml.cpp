@@ -420,6 +420,21 @@ winrt::TLTC__winUi3_::implementation::MainPageApp::~MainPageApp()
         m_timer.Stop();
         m_timer = nullptr;
     }
+    if (YoutubeView())
+    {
+        try
+        {
+            if (YoutubeView().CoreWebView2())
+            {
+                YoutubeView().CoreWebView2().Stop();
+            }
+            YoutubeView().Close();
+        }
+        catch (winrt::hresult_error const& ex)
+        {
+
+        }
+    }
 }
 
 void winrt::TLTC__winUi3_::implementation::MainPageApp::checkValueFromRobot(winrt::Windows::Foundation::IInspectable const&, winrt::Windows::Foundation::IInspectable const&)

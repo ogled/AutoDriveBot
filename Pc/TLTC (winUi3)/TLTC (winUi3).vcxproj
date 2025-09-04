@@ -231,22 +231,14 @@
     <CopyFileToFolders Include="Config.json">
       <FileType>Document</FileType>
     </CopyFileToFolders>
-    <Media Include="Assets\ParellParkRutube.html" />
-    <Media Include="Assets\GarageParkRutube.html" />
-    <Media Include="Assets\Video\End.mp4" />
-    <Media Include="Assets\Video\Garage.mp4" />
-    <Media Include="Assets\Video\Mountain.mp4" />
-    <Media Include="Assets\Video\ParellPark.mp4" />
-    <Media Include="Assets\Video\Start.mp4" />
-    <Media Include="Assets\Video\Turn.mp4" />
     <CopyFileToFolders Include="Assets\BluetoothDriver.py">
       <FileType>Document</FileType>
     </CopyFileToFolders>
+    <Image Include="Assets\Github-logo.svg">
+      <FileType>Document</FileType>
+    </Image>
     <None Include="packages.config" />
     <None Include="TLTC (winUi3)_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="Assets\Video\Hollow knight.mp4" />
   </ItemGroup>
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution

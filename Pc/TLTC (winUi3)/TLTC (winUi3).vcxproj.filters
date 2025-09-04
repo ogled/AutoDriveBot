@@ -90,6 +90,9 @@
     <Image Include="Assets\Square44x44Logo.scale-400.png">
       <Filter>Other</Filter>
     </Image>
+    <Image Include="Assets\Github-logo.svg">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
@@ -106,12 +109,6 @@
     </Filter>
     <Filter Include="Assets\Animated\RobotSleep">
       <UniqueIdentifier>{216806ec-a115-44d3-9f2d-a21618057e5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Assets\Video">
-      <UniqueIdentifier>{48ac7580-d070-4dbf-bd25-1d3f808c4a31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Assets\Htmls">
-      <UniqueIdentifier>{5add8b04-8a27-455f-b8ce-3973a1028b3f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Xaml">
       <UniqueIdentifier>{73e1728b-6144-4588-bc28-14ec554209af}</UniqueIdentifier>
@@ -146,35 +143,6 @@
     <CopyFileToFolders Include="Assets\BluetoothDriver.py">
       <Filter>Assets</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="Assets\Video\Hollow knight.mp4">
-      <Filter>Assets\Video</Filter>
-    </Media>
-    <Media Include="Assets\ParellParkRutube.html">
-      <Filter>Assets\Htmls</Filter>
-    </Media>
-    <Media Include="Assets\GarageParkRutube.html">
-      <Filter>Assets\Htmls</Filter>
-    </Media>
-    <Media Include="Assets\Video\Mountain.mp4">
-      <Filter>Assets\Video</Filter>
-    </Media>
-    <Media Include="Assets\Video\Start.mp4">
-      <Filter>Assets\Video</Filter>
-    </Media>
-    <Media Include="Assets\Video\End.mp4">
-      <Filter>Assets\Video</Filter>
-    </Media>
-    <Media Include="Assets\Video\Garage.mp4">
-      <Filter>Assets\Video</Filter>
-    </Media>
-    <Media Include="Assets\Video\Turn.mp4">
-      <Filter>Assets\Video</Filter>
-    </Media>
-    <Media Include="Assets\Video\ParellPark.mp4">
-      <Filter>Assets\Video</Filter>
-    </Media>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
