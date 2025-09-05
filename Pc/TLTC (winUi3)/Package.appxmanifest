@@ -10,7 +10,7 @@
   <Identity
     Name="d6b43368-54b6-4e97-9e3e-456cbf5fcff7"
     Publisher="CN=Даниил Сергей"
-    Version="0.7.25.0" />
+    Version="0.7.26.0" />
 
   <mp:PhoneIdentity PhoneProductId="d6b43368-54b6-4e97-9e3e-456cbf5fcff7" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

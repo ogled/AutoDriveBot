@@ -65,6 +65,7 @@ bool isPaused = false;
 bool isTempPaused = false;
 bool isEndSpeek = false;
 bool PcIsConnected = false;
+bool EnableReverseGearBuzzer = false;
 int speed = 50;
 int timerLine = 0;
 vex::color myColor(100, 200, 240);
@@ -505,14 +506,13 @@ void blueColor()
     LeftMotor.setStopping(brakeType::coast);
     LeftMotor.stop();
     RightMotor.spin(reverse);
+    EnableReverseGearBuzzer = true;
     while (BrainInertial.rotation(degrees) < -98)
     {
-        // Выводим текущие градусы на экран Brain
         Brain.Screen.clearLine(1);
         Brain.Screen.setCursor(1, 1);
         Brain.Screen.print("Rotation: %.2f degrees", BrainInertial.rotation(degrees));
 
-        // Ожидание перед следующей итерацией
         vex::task::sleep(10);
     }
     stopMotors();
@@ -520,7 +520,7 @@ void blueColor()
     resetMotorsSpeed();
     LeftMotor.spinFor(-450, degrees, false);
     RightMotor.spinFor(-450, degrees, true);
-    printf("Sleep\n");
+    EnableReverseGearBuzzer = false;
     wait(10, sec);
     startTimer();
     printf("FromGarage\n");
@@ -552,6 +552,7 @@ void parallelPark()
     wait(500, msec);
     setTurn(-40);
     wait(0.5, sec);
+    EnableReverseGearBuzzer = true;
     runMotors(reverse);
     while (BrainInertial.rotation(degrees) - startRotation < 57)
     {
@@ -573,6 +574,7 @@ void parallelPark()
     {
         wait(5,msec);
     }
+    EnableReverseGearBuzzer = false;
     stopMotors();
     wait(300, msec);
     wait(0.5, sec);
@@ -630,12 +632,12 @@ int beepTask()
 {
     while (true)
     {
-        if (LeftMotor.velocity(percent) < -10 || RightMotor.velocity(percent) < -10)
+        if (EnableReverseGearBuzzer)
         {
-            Brain.playNote(2, 4, 200); // Воспроизведение тона частотой 440 Гц на 100 мс
+            Brain.playNote(2, 4, 200);
             vex::task::sleep(200);
         }
-        vex::task::sleep(100); // Проверка каждые 100 мс
+        vex::task::sleep(100);
     }
     return 0;
 }
